@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-22T04:03:01.486Z",
+  "updatedAt": "2026-10-22T04:05:02.333Z",
   "products": [
     {
       "id": "cmv32zmch038jtosxt75gngl3",
@@ -487,7 +487,7 @@
       "reservedQuantity": 0,
       "availableQuantity": 2,
       "status": "lowStock",
-      "initialPriceEuro": 10,
+      "initialPriceEuro": 200,
       "netPriceEuro": 0,
       "rate": 260,
       "position": "",
