@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-22T04:23:05.553Z",
+  "updatedAt": "2026-10-22T04:31:41.537Z",
   "products": [
     {
       "id": "cmv32zmch038jtosxt75gngl3",
@@ -503,8 +503,8 @@
       "category": "COMME",
       "totalQuantity": 4,
       "soldQuantity": 0,
-      "reservedQuantity": 0,
-      "availableQuantity": 4,
+      "reservedQuantity": 1,
+      "availableQuantity": 3,
       "status": "lowStock",
       "initialPriceEuro": 300,
       "netPriceEuro": 0,
@@ -512,7 +512,7 @@
       "position": "",
       "orderDate": "2026-10-11T00:00:00.000Z",
       "hasDescription": true,
-      "hasReservation": false
+      "hasReservation": true
     },
     {
       "id": "cmv32zm8s0363tosxgamecehs",
