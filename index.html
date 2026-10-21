@@ -123,7 +123,8 @@
                     <th class="px-4 py-3 font-semibold text-center">Statut</th>
                     <th class="px-4 py-3 font-semibold text-right">Prix Init (€)</th>
                     <th class="px-4 py-3 font-semibold text-right">Prix Net (€)</th>
-                    <th class="px-4 py-3 font-semibold text-right">Prix Vente Unit. (DA)</th>
+                    <th class="px-4 py-3 font-semibold text-center">Taux</th>
+                    <th class="px-4 py-3 font-semibold text-right bg-blue-50">Prix Vente Unit. (DA)</th>
                     <th class="px-4 py-3 font-semibold">Position</th>
                 </tr>
             </thead>
@@ -158,7 +159,13 @@
     };
     function unitPriceDA(item) {
         // Use the value from stock.json if it provides one, otherwise Prix Net (€) x taux
-        const direct = toNum(item.unitSellingPriceDA ?? item.unitSellingPrice ?? item.sellingPriceDA ?? item.unitPriceDA ?? item.priceDA);
+        let raw = item.unitSellingPriceDA ?? item.unitSellingPrice ?? item.sellingPriceDA ?? item.unitPriceDA ?? item.priceDA;
+        if (raw == null) {
+            // Any field whose name looks like "unit selling price" / "prix de vente" / "DA"
+            const key = Object.keys(item).find(k => /(unit.*sell|sell.*unit|selling|vente|price.*(da|dzd)$|(da|dzd).*price)/i.test(k));
+            if (key) raw = item[key];
+        }
+        const direct = toNum(raw);
         if (!isNaN(direct)) return direct;
         const rate = toNum(item.rate ?? globalRate);
         const net = toNum(item.netPriceEuro);
@@ -308,7 +315,8 @@
                 <td class="px-4 py-3 text-center">${statusBadge(item.status)}</td>
                 <td class="px-4 py-3 text-right text-red-600 font-medium">€${fmt(item.initialPriceEuro)}</td>
                 <td class="px-4 py-3 text-right text-slate-700">€${fmt(item.netPriceEuro)}</td>
-                <td class="px-4 py-3 text-right text-blue-600 font-semibold">${fmtDA(unitPriceDA(item))}</td>
+                <td class="px-4 py-3 text-center text-blue-600 font-medium">${esc(item.rate)}</td>
+                <td class="px-4 py-3 text-right text-blue-700 font-semibold bg-blue-50/50">${fmtDA(unitPriceDA(item))}</td>
                 <td class="px-4 py-3 text-slate-500">${esc(item.position) || '-'}</td>
             </tr>`).join('');
 
@@ -336,6 +344,7 @@
                 <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 mt-3 pt-2 border-t border-slate-100 text-sm">
                     <div><span class="text-xs text-slate-500">Init </span><span class="text-red-600 font-medium">€${fmt(item.initialPriceEuro)}</span></div>
                     <div><span class="text-xs text-slate-500">Net </span><span class="text-slate-700 font-medium">€${fmt(item.netPriceEuro)}</span></div>
+                    <div><span class="text-xs text-slate-500">Taux </span><span class="text-blue-600 font-medium">${esc(item.rate)}</span></div>
                     <div><span class="text-xs text-slate-500">Vente unit. </span><span class="text-blue-600 font-semibold">${fmtDA(unitPriceDA(item))}</span></div>
                 </div>
             </article>`).join('');
