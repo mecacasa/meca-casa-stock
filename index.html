@@ -9,71 +9,102 @@
         .overflow-x-auto::-webkit-scrollbar { height: 8px; }
         .overflow-x-auto::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .overflow-x-auto::-webkit-scrollbar-track { background: #f1f5f9; }
+        /* Prevent iOS Safari from zooming into form fields */
+        @media (max-width: 767px) {
+            input, select { font-size: 16px !important; }
+        }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans p-4 md:p-8">
+<body class="bg-slate-50 text-slate-800 font-sans p-0 sm:p-4 md:p-8">
 
-<div class="max-w-[95%] mx-auto bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
-    
+<div class="w-full md:max-w-[95%] mx-auto bg-white sm:rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+
     <!-- Header -->
-    <div class="bg-[#1a5c37] px-4 py-4 md:px-6 md:py-5 text-white flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+    <div class="bg-[#1a5c37] px-4 py-4 sm:px-6 sm:py-5 text-white flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center">
         <div>
-            <h1 class="text-2xl font-bold tracking-tight">Meca-Casa</h1>
-            <p class="text-sm text-green-100 mt-1">Disponibilité du Stock</p>
+            <h1 class="text-xl sm:text-2xl font-bold tracking-tight">Meca-Casa</h1>
+            <p class="text-sm text-green-100 mt-0.5 sm:mt-1">Disponibilité du Stock</p>
         </div>
-        <div class="text-left md:text-right text-xs text-green-100">
-            <div>Dernière mise à jour:</div>
+        <div class="text-xs text-green-100 sm:text-right flex gap-1.5 sm:block">
+            <div>Dernière mise à jour :</div>
             <div id="last-updated" class="font-mono font-medium">Chargement...</div>
         </div>
     </div>
 
-    <!-- Filters Area -->
-    <div class="p-4 bg-slate-50 border-b border-slate-200">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            
-            <!-- Search -->
-            <div class="col-span-1 sm:col-span-2 lg:col-span-1">
-                <label class="block text-xs font-semibold text-slate-500 mb-1">Recherche</label>
-                <input type="text" id="search" placeholder="SAP, Article, Desc..." class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1a5c37] text-sm">
+    <!-- Filters Area (search stays sticky on phones) -->
+    <div class="p-3 sm:p-4 bg-slate-50 border-b border-slate-200 sticky top-0 z-20 md:static">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+
+            <!-- Search + mobile filter toggle -->
+            <div class="sm:col-span-2 lg:col-span-1">
+                <label for="search" class="block text-xs font-semibold text-slate-500 mb-1">Recherche</label>
+                <div class="flex gap-2">
+                    <input type="search" id="search" placeholder="SAP, Article, Desc..." class="flex-1 min-w-0 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1a5c37] text-sm">
+                    <button id="btn-toggle-filters" type="button" aria-expanded="false" aria-controls="filter-extra" class="md:hidden shrink-0 px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm font-medium text-slate-700 active:bg-slate-100">
+                        Filtres <span id="filter-count" class="hidden ml-1 px-1.5 py-0.5 bg-[#1a5c37] text-white text-xs rounded-full"></span>
+                    </button>
+                </div>
             </div>
 
-            <!-- Category -->
-            <div>
-                <label class="block text-xs font-semibold text-slate-500 mb-1">Catégorie</label>
-                <select id="filter-category" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1a5c37]">
-                    <option value="">Toutes les catégories</option>
-                </select>
-            </div>
+            <!-- Other filters: collapsed on phones, always visible from md up -->
+            <div id="filter-extra" class="contents max-md:hidden">
+                <div>
+                    <label for="filter-category" class="block text-xs font-semibold text-slate-500 mb-1">Catégorie</label>
+                    <select id="filter-category" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#1a5c37]">
+                        <option value="">Toutes les catégories</option>
+                    </select>
+                </div>
 
-            <!-- Status -->
-            <div>
-                <label class="block text-xs font-semibold text-slate-500 mb-1">Statut</label>
-                <select id="filter-status" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1a5c37]">
-                    <option value="">Tous les statuts</option>
-                    <option value="inStock">En Stock</option>
-                    <option value="lowStock">Stock Faible</option>
-                    <option value="outOfStock">Rupture</option>
-                </select>
-            </div>
+                <div>
+                    <label for="filter-status" class="block text-xs font-semibold text-slate-500 mb-1">Statut</label>
+                    <select id="filter-status" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#1a5c37]">
+                        <option value="">Tous les statuts</option>
+                        <option value="inStock">En Stock</option>
+                        <option value="lowStock">Stock Faible</option>
+                        <option value="outOfStock">Rupture</option>
+                    </select>
+                </div>
 
-            <!-- Position -->
-            <div>
-                <label class="block text-xs font-semibold text-slate-500 mb-1">Position</label>
-                <select id="filter-position" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1a5c37]">
-                    <option value="">Toutes les positions</option>
-                </select>
-            </div>
+                <div>
+                    <label for="filter-position" class="block text-xs font-semibold text-slate-500 mb-1">Position</label>
+                    <select id="filter-position" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#1a5c37]">
+                        <option value="">Toutes les positions</option>
+                    </select>
+                </div>
 
-            <!-- Reset Button -->
-            <div class="flex items-end sm:col-span-2 lg:col-span-4">
-                <button id="btn-reset" class="w-full md:w-auto px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium rounded-lg text-sm transition-colors">
-                    Réinitialiser les filtres
-                </button>
+                <div>
+                    <label for="filter-date" class="block text-xs font-semibold text-slate-500 mb-1">Date de commande</label>
+                    <select id="filter-date" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#1a5c37]">
+                        <option value="all">Tout le temps</option>
+                        <option value="7d">7 derniers jours</option>
+                        <option value="30d">30 derniers jours</option>
+                        <option value="90d">90 derniers jours</option>
+                        <option value="6m">6 derniers mois</option>
+                        <option value="1y">Dernière année</option>
+                        <option value="older">Plus d'un an</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="filter-reservation" class="block text-xs font-semibold text-slate-500 mb-1">A une réservation</label>
+                    <select id="filter-reservation" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#1a5c37]">
+                        <option value="any">Tous</option>
+                        <option value="yes">Oui</option>
+                        <option value="no">Non</option>
+                    </select>
+                </div>
+
+                <div class="flex items-end">
+                    <button id="btn-reset" type="button" class="w-full px-4 py-2 bg-slate-200 hover:bg-slate-300 active:bg-slate-300 text-slate-700 font-medium rounded-lg text-sm transition-colors">
+                        Réinitialiser les filtres
+                    </button>
+                </div>
             </div>
         </div>
+        <div id="result-count" class="mt-2 text-xs text-slate-500 md:hidden"></div>
     </div>
 
-    <!-- DESKTOP TABLE VIEW (Hidden on Mobile) -->
+    <!-- Desktop / tablet: table -->
     <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-left text-sm whitespace-nowrap">
             <thead class="bg-slate-100 text-slate-600 border-b border-slate-200">
@@ -82,24 +113,26 @@
                     <th class="px-4 py-3 font-semibold">Article</th>
                     <th class="px-4 py-3 font-semibold">Description</th>
                     <th class="px-4 py-3 font-semibold">Catégorie</th>
+                    <th class="px-4 py-3 font-semibold text-center bg-blue-50">Qté</th>
+                    <th class="px-4 py-3 font-semibold text-center">Vendu</th>
+                    <th class="px-4 py-3 font-semibold text-center">Réservé</th>
                     <th class="px-4 py-3 font-semibold text-center bg-green-50">Disponible</th>
                     <th class="px-4 py-3 font-semibold text-center">Statut</th>
+                    <th class="px-4 py-3 font-semibold text-right">Prix Init (€)</th>
                     <th class="px-4 py-3 font-semibold text-right">Prix Net (€)</th>
+                    <th class="px-4 py-3 font-semibold text-center">Taux</th>
+                    <th class="px-4 py-3 font-semibold">Position</th>
                 </tr>
             </thead>
-            <tbody id="stock-body-desktop" class="divide-y divide-slate-100">
-                <!-- Rows injected by JS -->
-            </tbody>
+            <tbody id="stock-body" class="divide-y divide-slate-100"></tbody>
         </table>
     </div>
 
-    <!-- MOBILE CARD VIEW (Hidden on Desktop) -->
-    <div id="stock-body-mobile" class="md:hidden divide-y divide-slate-100">
-        <!-- Cards injected by JS -->
-    </div>
+    <!-- Phones: cards -->
+    <div id="stock-cards" class="md:hidden p-3 space-y-3 bg-slate-50"></div>
 
-    <!-- Empty State -->
-    <div id="empty-state" class="hidden p-12 text-center text-slate-500">
+    <!-- Empty / error state -->
+    <div id="empty-state" class="hidden p-10 sm:p-12 text-center text-slate-500 text-sm">
         Aucun produit ne correspond à vos filtres.
     </div>
 
@@ -107,25 +140,33 @@
 
 <script>
     let allStockData = [];
-    let filters = { search: '', category: '', status: '', position: '' };
+    const DEFAULT_FILTERS = { search: '', category: '', status: '', position: '', date: 'all', reservation: 'any' };
+    let filters = { ...DEFAULT_FILTERS };
+
+    const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const fmt = (n) => Number(n || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     async function fetchStock() {
         try {
             const response = await fetch('stock.json?t=' + new Date().getTime());
             if (!response.ok) throw new Error('Data not ready');
-            
+
             const data = await response.json();
             allStockData = data.products || [];
-            
+
             document.getElementById('last-updated').innerText = new Date(data.updatedAt).toLocaleString('fr-FR');
-            
+
             populateDropdown('filter-category', [...new Set(allStockData.map(i => i.category).filter(Boolean))]);
             populateDropdown('filter-position', [...new Set(allStockData.map(i => i.position).filter(Boolean))]);
-            
+
             applyFilters();
         } catch (error) {
-            document.getElementById('stock-body-desktop').innerHTML = `<tr><td colspan="7" class="text-center py-8 text-red-500">Erreur de chargement.</td></tr>`;
-            document.getElementById('stock-body-mobile').innerHTML = `<div class="p-4 text-center text-red-500 text-sm">Erreur de chargement.</div>`;
+            document.getElementById('stock-body').innerHTML = '';
+            document.getElementById('stock-cards').innerHTML = '';
+            const empty = document.getElementById('empty-state');
+            empty.textContent = 'Erreur : impossible de charger les données.';
+            empty.classList.add('text-red-500');
+            empty.classList.remove('hidden');
         }
     }
 
@@ -143,99 +184,156 @@
     }
 
     function applyFilters() {
+        const now = new Date().getTime();
+        const dayMs = 24 * 60 * 60 * 1000;
+
         const filtered = allStockData.filter(item => {
             const term = filters.search.toLowerCase();
-            const matchSearch = !term || 
-                item.sap.toLowerCase().includes(term) || 
-                item.article.toLowerCase().includes(term) || 
+            const matchSearch = !term ||
+                (item.sap || '').toLowerCase().includes(term) ||
+                (item.article || '').toLowerCase().includes(term) ||
                 (item.description && item.description.toLowerCase().includes(term));
-            
+
             const matchCategory = !filters.category || item.category === filters.category;
             const matchStatus = !filters.status || item.status === filters.status;
             const matchPosition = !filters.position || item.position === filters.position;
 
-            return matchSearch && matchCategory && matchStatus && matchPosition;
+            let matchReservation = true;
+            if (filters.reservation === 'yes') matchReservation = item.hasReservation === true;
+            if (filters.reservation === 'no') matchReservation = item.hasReservation === false;
+
+            let matchDate = true;
+            if (filters.date !== 'all' && item.orderDate) {
+                const age = now - new Date(item.orderDate).getTime();
+                if (filters.date === '7d') matchDate = age <= 7 * dayMs;
+                if (filters.date === '30d') matchDate = age <= 30 * dayMs;
+                if (filters.date === '90d') matchDate = age <= 90 * dayMs;
+                if (filters.date === '6m') matchDate = age <= 180 * dayMs;
+                if (filters.date === '1y') matchDate = age <= 365 * dayMs;
+                if (filters.date === 'older') matchDate = age > 365 * dayMs;
+            } else if (filters.date !== 'all' && !item.orderDate) {
+                matchDate = false;
+            }
+
+            return matchSearch && matchCategory && matchStatus && matchPosition && matchReservation && matchDate;
         });
 
-        renderViews(filtered);
+        updateFilterBadge();
+        document.getElementById('result-count').textContent =
+            `${filtered.length} produit${filtered.length > 1 ? 's' : ''} sur ${allStockData.length}`;
+        renderTable(filtered);
     }
 
-    function getStatusBadge(status) {
-        if (status === 'inStock') return `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">En Stock</span>`;
-        if (status === 'lowStock') return `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">Stock Faible</span>`;
-        return `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">Rupture</span>`;
+    // Number of active filters (excluding search) shown on the mobile "Filtres" button
+    function updateFilterBadge() {
+        let n = 0;
+        if (filters.category) n++;
+        if (filters.status) n++;
+        if (filters.position) n++;
+        if (filters.date !== 'all') n++;
+        if (filters.reservation !== 'any') n++;
+        const badge = document.getElementById('filter-count');
+        badge.textContent = n;
+        badge.classList.toggle('hidden', n === 0);
     }
 
-    function renderViews(data) {
-        const tbodyDesktop = document.getElementById('stock-body-desktop');
-        const tbodyMobile = document.getElementById('stock-body-mobile');
+    function statusBadge(status) {
+        if (status === 'inStock') return `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 border border-green-200">En Stock</span>`;
+        if (status === 'lowStock') return `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700 border border-yellow-200">Stock Faible</span>`;
+        return `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 border border-red-200">Rupture</span>`;
+    }
+
+    function renderTable(data) {
+        const tbody = document.getElementById('stock-body');
+        const cards = document.getElementById('stock-cards');
         const empty = document.getElementById('empty-state');
-        
+
+        empty.classList.remove('text-red-500');
+        empty.textContent = 'Aucun produit ne correspond à vos filtres.';
+
         if (data.length === 0) {
-            tbodyDesktop.innerHTML = '';
-            tbodyMobile.innerHTML = '';
+            tbody.innerHTML = '';
+            cards.innerHTML = '';
             empty.classList.remove('hidden');
             return;
         }
         empty.classList.add('hidden');
 
-        const fmt = (n) => n.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-        // 1. Render Desktop Table
-        tbodyDesktop.innerHTML = data.map(item => `
+        // Table rows (md and up)
+        tbody.innerHTML = data.map(item => `
             <tr class="hover:bg-slate-50 transition-colors">
-                <td class="px-4 py-3 font-medium text-slate-700">${item.sap}</td>
-                <td class="px-4 py-3 font-medium">${item.article}</td>
-                <td class="px-4 py-3 text-slate-500 max-w-[200px] truncate">${item.description || '-'}</td>
-                <td class="px-4 py-3">${item.category || '-'}</td>
-                <td class="px-4 py-3 text-center font-bold text-green-700 bg-green-50/50">${item.availableQuantity}</td>
-                <td class="px-4 py-3 text-center">${getStatusBadge(item.status)}</td>
+                <td class="px-4 py-3 font-medium text-slate-700">${esc(item.sap)}</td>
+                <td class="px-4 py-3 font-medium">${esc(item.article)}</td>
+                <td class="px-4 py-3 text-slate-500 max-w-[200px] truncate" title="${esc(item.description)}">${esc(item.description) || '-'}</td>
+                <td class="px-4 py-3">
+                    ${item.category ? `<span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded border border-slate-200">${esc(item.category)}</span>` : '-'}
+                </td>
+                <td class="px-4 py-3 text-center font-semibold bg-blue-50/50">${esc(item.totalQuantity)}</td>
+                <td class="px-4 py-3 text-center text-slate-500">${esc(item.soldQuantity) || '-'}</td>
+                <td class="px-4 py-3 text-center text-orange-500">${esc(item.reservedQuantity) || '-'}</td>
+                <td class="px-4 py-3 text-center font-bold text-green-700 bg-green-50/50">${esc(item.availableQuantity)}</td>
+                <td class="px-4 py-3 text-center">${statusBadge(item.status)}</td>
+                <td class="px-4 py-3 text-right text-red-600 font-medium">€${fmt(item.initialPriceEuro)}</td>
                 <td class="px-4 py-3 text-right text-slate-700">€${fmt(item.netPriceEuro)}</td>
-            </tr>
-        `).join('');
+                <td class="px-4 py-3 text-center text-blue-600 font-medium">${esc(item.rate)}</td>
+                <td class="px-4 py-3 text-slate-500">${esc(item.position) || '-'}</td>
+            </tr>`).join('');
 
-        // 2. Render Mobile Cards
-        tbodyMobile.innerHTML = data.map(item => `
-            <div class="p-4 bg-white hover:bg-slate-50 transition-colors flex flex-col gap-2">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <div class="font-bold text-slate-800 text-base">${item.article}</div>
-                        <div class="text-xs text-slate-500 font-mono">SAP: ${item.sap}</div>
+        // Cards (phones)
+        cards.innerHTML = data.map(item => `
+            <article class="bg-white rounded-lg border border-slate-200 shadow-sm p-3">
+                <div class="flex items-start justify-between gap-2">
+                    <div class="min-w-0">
+                        <h2 class="font-semibold text-slate-800 break-words">${esc(item.article)}</h2>
+                        <div class="text-xs text-slate-500 mt-0.5">SAP ${esc(item.sap)}</div>
                     </div>
-                    ${getStatusBadge(item.status)}
+                    <div class="shrink-0">${statusBadge(item.status)}</div>
                 </div>
-                
-                <div class="text-sm text-slate-600 line-clamp-2">${item.description || 'Pas de description'}</div>
-                
-                <div class="flex justify-between items-end mt-2 pt-2 border-t border-slate-100">
-                    <div>
-                        <div class="text-xs text-slate-400 uppercase tracking-wider font-semibold mb-1">Disponible</div>
-                        <div class="text-xl font-bold text-green-700">${item.availableQuantity}</div>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-xs text-slate-400 uppercase tracking-wider font-semibold mb-1">Prix Net</div>
-                        <div class="font-medium text-slate-700">€${fmt(item.netPriceEuro)}</div>
-                    </div>
+                ${item.description ? `<p class="text-sm text-slate-500 mt-2 break-words">${esc(item.description)}</p>` : ''}
+                <div class="flex flex-wrap gap-1.5 mt-2">
+                    ${item.category ? `<span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded border border-slate-200">${esc(item.category)}</span>` : ''}
+                    ${item.position ? `<span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded border border-slate-200">Pos. ${esc(item.position)}</span>` : ''}
                 </div>
-            </div>
-        `).join('');
+                <div class="grid grid-cols-4 gap-1.5 mt-3 text-center">
+                    <div class="rounded bg-blue-50 py-1.5"><div class="text-[11px] text-slate-500">Qté</div><div class="font-semibold">${esc(item.totalQuantity)}</div></div>
+                    <div class="rounded bg-slate-50 py-1.5"><div class="text-[11px] text-slate-500">Vendu</div><div class="font-medium text-slate-600">${esc(item.soldQuantity || 0)}</div></div>
+                    <div class="rounded bg-orange-50 py-1.5"><div class="text-[11px] text-slate-500">Réservé</div><div class="font-medium text-orange-500">${esc(item.reservedQuantity || 0)}</div></div>
+                    <div class="rounded bg-green-50 py-1.5"><div class="text-[11px] text-slate-500">Dispo</div><div class="font-bold text-green-700">${esc(item.availableQuantity)}</div></div>
+                </div>
+                <div class="flex items-center justify-between gap-2 mt-3 pt-2 border-t border-slate-100 text-sm">
+                    <div><span class="text-xs text-slate-500">Init </span><span class="text-red-600 font-medium">€${fmt(item.initialPriceEuro)}</span></div>
+                    <div><span class="text-xs text-slate-500">Net </span><span class="text-slate-700 font-medium">€${fmt(item.netPriceEuro)}</span></div>
+                    <div><span class="text-xs text-slate-500">Taux </span><span class="text-blue-600 font-medium">${esc(item.rate)}</span></div>
+                </div>
+            </article>`).join('');
     }
 
-    // Event Listeners
+    // Event listeners
     document.getElementById('search').addEventListener('input', (e) => { filters.search = e.target.value; applyFilters(); });
     document.getElementById('filter-category').addEventListener('change', (e) => { filters.category = e.target.value; applyFilters(); });
     document.getElementById('filter-status').addEventListener('change', (e) => { filters.status = e.target.value; applyFilters(); });
     document.getElementById('filter-position').addEventListener('change', (e) => { filters.position = e.target.value; applyFilters(); });
+    document.getElementById('filter-date').addEventListener('change', (e) => { filters.date = e.target.value; applyFilters(); });
+    document.getElementById('filter-reservation').addEventListener('change', (e) => { filters.reservation = e.target.value; applyFilters(); });
+
+    document.getElementById('btn-toggle-filters').addEventListener('click', (e) => {
+        const panel = document.getElementById('filter-extra');
+        const hidden = panel.classList.toggle('max-md:hidden');
+        e.currentTarget.setAttribute('aria-expanded', String(!hidden));
+    });
 
     document.getElementById('btn-reset').addEventListener('click', () => {
         document.getElementById('search').value = '';
         document.getElementById('filter-category').value = '';
         document.getElementById('filter-status').value = '';
         document.getElementById('filter-position').value = '';
-        filters = { search: '', category: '', status: '', position: '' };
+        document.getElementById('filter-date').value = 'all';
+        document.getElementById('filter-reservation').value = 'any';
+        filters = { ...DEFAULT_FILTERS };
         applyFilters();
     });
 
+    // Initial load and polling
     fetchStock();
     setInterval(fetchStock, 60000);
 </script>
