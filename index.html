@@ -21,10 +21,15 @@
 <div class="w-full md:max-w-[95%] mx-auto bg-white sm:rounded-xl shadow-lg border border-slate-200 overflow-hidden">
 
     <!-- Header -->
-    <div class="bg-[#1a5c37] px-4 py-4 sm:px-6 sm:py-5 text-white flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center">
+    <div class="bg-[#1a5c37] px-4 py-4 sm:px-6 sm:py-5 text-white flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
         <div>
             <h1 class="text-xl sm:text-2xl font-bold tracking-tight">Meca-Casa</h1>
             <p class="text-sm text-green-100 mt-0.5 sm:mt-1">Disponibilité du Stock</p>
+            
+            <!-- THE RATE IS NOW SHOWN HERE ONE TIME -->
+            <div id="rate-banner" class="hidden mt-2 px-3 py-1 bg-white/15 rounded-full text-xs font-medium inline-block">
+                Taux actuel : <span id="rate-value" class="font-mono">-</span> DA
+            </div>
         </div>
         <div class="text-xs text-green-100 sm:text-right flex gap-1.5 sm:block">
             <div>Dernière mise à jour :</div>
@@ -159,6 +164,15 @@
     const tableMq = window.matchMedia('(min-width: 1024px)');
     tableMq.addEventListener('change', () => { if (allStockData.length) renderTable(lastRendered); });
 
+    function updateGlobalRate() {
+        // Find the first product that has a rate to display at the top
+        const firstWithRate = allStockData.find(p => p.rate != null && p.rate > 0);
+        const rate = firstWithRate ? firstWithRate.rate : 1;
+        
+        document.getElementById('rate-value').textContent = fmt(rate);
+        document.getElementById('rate-banner').classList.remove('hidden');
+    }
+
     async function fetchStock() {
         try {
             const response = await fetch('stock.json?t=' + new Date().getTime(), { cache: 'no-store' });
@@ -172,6 +186,7 @@
             allStockData = data.products || [];
 
             prepareData();
+            updateGlobalRate(); // Update the rate at the top
             document.getElementById('last-updated').innerText = new Date(data.updatedAt).toLocaleString('fr-FR');
 
             populateDropdown('filter-category', [...new Set(allStockData.map(i => i.category).filter(Boolean))]);
