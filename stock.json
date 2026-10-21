@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-22T02:18:35.721Z",
+  "updatedAt": "2026-10-22T02:21:58.118Z",
   "products": [
     {
       "id": "cmvg1v5on0001a8sxzln52l6h",
@@ -17,25 +17,6 @@
       "rate": 260,
       "position": "3N/56",
       "orderDate": "2026-10-20T00:00:00.000Z",
-      "hasDescription": true,
-      "hasReservation": false
-    },
-    {
-      "id": "cmvcxy69t00022wsxbs3licp8",
-      "sap": "hhhhhh",
-      "article": "hhhhhhh",
-      "description": "hhhhhhh",
-      "category": "",
-      "totalQuantity": 1,
-      "soldQuantity": 0,
-      "reservedQuantity": 0,
-      "availableQuantity": 1,
-      "status": "lowStock",
-      "initialPriceEuro": 200,
-      "netPriceEuro": 200,
-      "rate": 260,
-      "position": "",
-      "orderDate": "2026-10-17T00:00:00.000Z",
       "hasDescription": true,
       "hasReservation": false
     },
