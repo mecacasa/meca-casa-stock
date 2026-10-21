@@ -24,6 +24,9 @@
         <div>
             <h1 class="text-xl sm:text-2xl font-bold tracking-tight">Meca-Casa</h1>
             <p class="text-sm text-green-100 mt-0.5 sm:mt-1">Disponibilité du Stock</p>
+            <div id="rate-banner" class="hidden mt-2 px-2.5 py-1 bg-white/15 rounded-full text-xs font-medium">
+                Taux : <span id="rate-value" class="font-mono"></span>
+            </div>
         </div>
         <div class="text-xs text-green-100 sm:text-right flex gap-1.5 sm:block">
             <div>Dernière mise à jour :</div>
@@ -120,7 +123,7 @@
                     <th class="px-4 py-3 font-semibold text-center">Statut</th>
                     <th class="px-4 py-3 font-semibold text-right">Prix Init (€)</th>
                     <th class="px-4 py-3 font-semibold text-right">Prix Net (€)</th>
-                    <th class="px-4 py-3 font-semibold text-center">Taux</th>
+                    <th class="px-4 py-3 font-semibold text-right">Prix Vente Unit. (DA)</th>
                     <th class="px-4 py-3 font-semibold">Position</th>
                 </tr>
             </thead>
@@ -146,6 +149,31 @@
     const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const fmt = (n) => Number(n || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+    // Shared rate (same for every product) and unit selling price in DA
+    let globalRate = null;
+    const toNum = (v) => {
+        if (v == null || v === '') return NaN;
+        if (typeof v === 'number') return v;
+        return parseFloat(String(v).replace(/\s/g, '').replace(',', '.').replace(/[^0-9.\-]/g, ''));
+    };
+    function unitPriceDA(item) {
+        // Use the value from stock.json if it provides one, otherwise Prix Net (€) x taux
+        const direct = toNum(item.unitSellingPriceDA ?? item.unitSellingPrice ?? item.sellingPriceDA ?? item.unitPriceDA ?? item.priceDA);
+        if (!isNaN(direct)) return direct;
+        const rate = toNum(item.rate ?? globalRate);
+        const net = toNum(item.netPriceEuro);
+        return (!isNaN(rate) && !isNaN(net)) ? net * rate : null;
+    }
+    const fmtDA = (n) => n == null ? '-' : fmt(n) + ' DA';
+
+    function updateRateBanner() {
+        const banner = document.getElementById('rate-banner');
+        const n = toNum(globalRate);
+        if (globalRate == null || globalRate === '') { banner.classList.add('hidden'); return; }
+        document.getElementById('rate-value').textContent = isNaN(n) ? String(globalRate) : `1 € = ${fmt(n)} DA`;
+        banner.classList.remove('hidden');
+    }
+
     async function fetchStock() {
         try {
             const response = await fetch('stock.json?t=' + new Date().getTime());
@@ -153,6 +181,11 @@
 
             const data = await response.json();
             allStockData = data.products || [];
+
+            // Rate is identical for all products: take it from the top level, else from the first product that has one
+            const firstWithRate = allStockData.find(p => p.rate != null && p.rate !== '');
+            globalRate = data.rate ?? (firstWithRate ? firstWithRate.rate : null);
+            updateRateBanner();
 
             document.getElementById('last-updated').innerText = new Date(data.updatedAt).toLocaleString('fr-FR');
 
@@ -275,7 +308,7 @@
                 <td class="px-4 py-3 text-center">${statusBadge(item.status)}</td>
                 <td class="px-4 py-3 text-right text-red-600 font-medium">€${fmt(item.initialPriceEuro)}</td>
                 <td class="px-4 py-3 text-right text-slate-700">€${fmt(item.netPriceEuro)}</td>
-                <td class="px-4 py-3 text-center text-blue-600 font-medium">${esc(item.rate)}</td>
+                <td class="px-4 py-3 text-right text-blue-600 font-semibold">${fmtDA(unitPriceDA(item))}</td>
                 <td class="px-4 py-3 text-slate-500">${esc(item.position) || '-'}</td>
             </tr>`).join('');
 
@@ -300,10 +333,10 @@
                     <div class="rounded bg-orange-50 py-1.5"><div class="text-[11px] text-slate-500">Réservé</div><div class="font-medium text-orange-500">${esc(item.reservedQuantity || 0)}</div></div>
                     <div class="rounded bg-green-50 py-1.5"><div class="text-[11px] text-slate-500">Dispo</div><div class="font-bold text-green-700">${esc(item.availableQuantity)}</div></div>
                 </div>
-                <div class="flex items-center justify-between gap-2 mt-3 pt-2 border-t border-slate-100 text-sm">
+                <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 mt-3 pt-2 border-t border-slate-100 text-sm">
                     <div><span class="text-xs text-slate-500">Init </span><span class="text-red-600 font-medium">€${fmt(item.initialPriceEuro)}</span></div>
                     <div><span class="text-xs text-slate-500">Net </span><span class="text-slate-700 font-medium">€${fmt(item.netPriceEuro)}</span></div>
-                    <div><span class="text-xs text-slate-500">Taux </span><span class="text-blue-600 font-medium">${esc(item.rate)}</span></div>
+                    <div><span class="text-xs text-slate-500">Vente unit. </span><span class="text-blue-600 font-semibold">${fmtDA(unitPriceDA(item))}</span></div>
                 </div>
             </article>`).join('');
     }
