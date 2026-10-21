@@ -1,0 +1,1 @@
+# meca-casa-stock
