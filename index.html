@@ -22,7 +22,7 @@
             
             <!-- TABS -->
             <div class="flex gap-2 mt-3">
-                <button id="tab-btn-stock" class="px-4 py-1.5 rounded-full text-sm font-semibold bg-white text-[#1a5c37] transition-colors">Disponibilité</button>
+                <button id="tab-btn-stock" class="px-4 py-1.5 rounded-full text-sm font-semibold bg-white text-[#1a5c37] transition-colors shadow-sm">Disponibilité</button>
                 <button id="tab-btn-prices" class="px-4 py-1.5 rounded-full text-sm font-semibold bg-white/20 text-white hover:bg-white/30 transition-colors">Liste des Prix</button>
             </div>
         </div>
@@ -35,14 +35,14 @@
         </div>
     </div>
 
-    <!-- TAB: STOCK -->
+    <!-- ================= TAB 1: STOCK ================= -->
     <div id="view-stock">
-        <!-- Filters Area -->
+        <!-- Filters -->
         <div class="p-3 sm:p-4 bg-slate-50 border-b border-slate-200 sticky top-0 z-20 md:static">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 <div class="sm:col-span-2 lg:col-span-1">
                     <label class="block text-xs font-semibold text-slate-500 mb-1">Recherche</label>
-                    <input type="search" id="search" placeholder="SAP, Article, Desc..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                    <input type="search" id="search" placeholder="SAP, Article, Desc..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-[#1a5c37]">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 mb-1">Catégorie</label>
@@ -53,40 +53,54 @@
                     <select id="filter-status" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
                         <option value="">Tous</option>
                         <option value="inStock">En Stock</option>
+                        <option value="lowStock">Stock Faible</option>
                         <option value="outOfStock">Rupture</option>
                     </select>
+                </div>
+                <div class="flex items-end">
+                    <button id="btn-reset" class="w-full px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium rounded-lg text-sm transition-colors">Réinitialiser</button>
                 </div>
             </div>
         </div>
 
-        <!-- Desktop Table -->
+        <!-- Desktop Table (Detailed) -->
         <div class="hidden lg:block overflow-x-auto">
             <table class="w-full text-left text-xs xl:text-sm">
                 <thead class="bg-slate-100 text-slate-600 border-b border-slate-200">
                     <tr>
-                        <th class="px-4 py-3 font-semibold">SAP</th>
-                        <th class="px-4 py-3 font-semibold">Article</th>
-                        <th class="px-4 py-3 font-semibold">Description</th>
-                        <th class="px-4 py-3 font-semibold text-center">Dispo</th>
-                        <th class="px-4 py-3 font-semibold text-right">Prix Vente (DA)</th>
+                        <th class="px-2 xl:px-4 py-3 font-semibold">SAP</th>
+                        <th class="px-2 xl:px-4 py-3 font-semibold">Article</th>
+                        <th class="px-2 xl:px-4 py-3 font-semibold">Description</th>
+                        <th class="px-2 xl:px-4 py-3 font-semibold">Catégorie</th>
+                        <th class="px-2 xl:px-4 py-3 font-semibold text-center bg-blue-50">Qté</th>
+                        <th class="px-2 xl:px-4 py-3 font-semibold text-center">Vendu</th>
+                        <th class="px-2 xl:px-4 py-3 font-semibold text-center">Réservé</th>
+                        <th class="px-2 xl:px-4 py-3 font-semibold text-center bg-green-50">Dispo</th>
+                        <th class="px-2 xl:px-4 py-3 font-semibold text-center">Statut</th>
+                        <th class="px-2 xl:px-4 py-3 font-semibold text-right">Prix Init (€)</th>
+                        <th class="px-2 xl:px-4 py-3 font-semibold text-right">Prix Net (€)</th>
+                        <th class="px-2 xl:px-4 py-3 font-semibold text-right bg-blue-50">Prix Vente (DA)</th>
+                        <th class="px-2 xl:px-4 py-3 font-semibold">Position</th>
                     </tr>
                 </thead>
                 <tbody id="stock-body" class="divide-y divide-slate-100"></tbody>
             </table>
         </div>
+
         <!-- Mobile Cards -->
         <div id="stock-cards" class="lg:hidden p-3 space-y-3 bg-slate-50"></div>
     </div>
 
-    <!-- TAB: NET PRICES -->
+    <!-- ================= TAB 2: NET PRICES ================= -->
     <div id="view-prices" class="hidden">
         <div class="p-3 sm:p-4 bg-slate-50 border-b border-slate-200">
             <div class="w-full max-w-md">
                 <label class="block text-xs font-semibold text-slate-500 mb-1">Recherche dans les prix</label>
-                <input type="search" id="search-prices" placeholder="SAP, Article, Desc..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                <input type="search" id="search-prices" placeholder="SAP, Article, Desc..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-[#1a5c37]">
             </div>
         </div>
 
+        <!-- Desktop Table -->
         <div class="hidden lg:block overflow-x-auto">
             <table class="w-full text-left text-xs xl:text-sm">
                 <thead class="bg-slate-100 text-slate-600 border-b border-slate-200">
@@ -101,117 +115,154 @@
                 <tbody id="prices-body" class="divide-y divide-slate-100"></tbody>
             </table>
         </div>
+
         <!-- Mobile Cards -->
         <div id="prices-cards" class="lg:hidden p-3 space-y-3 bg-slate-50"></div>
     </div>
 
+    <div id="empty-state" class="hidden p-10 text-center text-slate-500 text-sm">Aucune donnée disponible.</div>
 </div>
 
 <script>
     let stockData = [];
     let priceData = [];
     let globalRate = 1;
-    
-    // Tabs UI
+    let lastRawStock = null;
+    let lastRawPrices = null;
+
+    // --- TABS LOGIC ---
     const btnStock = document.getElementById('tab-btn-stock');
     const btnPrices = document.getElementById('tab-btn-prices');
     const viewStock = document.getElementById('view-stock');
     const viewPrices = document.getElementById('view-prices');
 
     btnStock.addEventListener('click', () => {
-        btnStock.className = "px-4 py-1.5 rounded-full text-sm font-semibold bg-white text-[#1a5c37] transition-colors";
+        btnStock.className = "px-4 py-1.5 rounded-full text-sm font-semibold bg-white text-[#1a5c37] transition-colors shadow-sm";
         btnPrices.className = "px-4 py-1.5 rounded-full text-sm font-semibold bg-white/20 text-white hover:bg-white/30 transition-colors";
-        viewStock.classList.remove('hidden');
-        viewPrices.classList.add('hidden');
+        viewStock.classList.remove('hidden'); viewPrices.classList.add('hidden');
     });
 
     btnPrices.addEventListener('click', () => {
-        btnPrices.className = "px-4 py-1.5 rounded-full text-sm font-semibold bg-white text-[#1a5c37] transition-colors";
+        btnPrices.className = "px-4 py-1.5 rounded-full text-sm font-semibold bg-white text-[#1a5c37] transition-colors shadow-sm";
         btnStock.className = "px-4 py-1.5 rounded-full text-sm font-semibold bg-white/20 text-white hover:bg-white/30 transition-colors";
-        viewPrices.classList.remove('hidden');
-        viewStock.classList.add('hidden');
+        viewPrices.classList.remove('hidden'); viewStock.classList.add('hidden');
     });
 
     const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const fmt = (n) => Number(n || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+    function getSellingPriceDA(item) {
+        if (item.sellingPriceDA != null && item.sellingPriceDA > 0) return item.sellingPriceDA;
+        const net = Number(item.netPriceEuro) || 0;
+        const init = Number(item.initialPriceEuro) || 0;
+        const rate = Number(item.rate) || 1;
+        return Math.max(net, init) * rate;
+    }
+
     async function loadData() {
+        // 1. Load Stock Data
         try {
-            // Load Stock
             const resStock = await fetch('stock.json?t=' + new Date().getTime(), { cache: 'no-store' });
             if (resStock.ok) {
-                const data = await resStock.json();
-                stockData = data.products || [];
-                document.getElementById('last-updated').innerText = new Date(data.updatedAt).toLocaleString('fr-FR');
-                
-                // Extract Rate
-                const firstWithRate = stockData.find(p => p.rate != null && p.rate > 0);
-                if (firstWithRate) {
-                    globalRate = firstWithRate.rate;
-                    document.getElementById('rate-value').textContent = fmt(globalRate);
-                    document.getElementById('rate-banner').classList.remove('hidden');
+                const text = await resStock.text();
+                if (text !== lastRawStock) {
+                    lastRawStock = text;
+                    const data = JSON.parse(text);
+                    stockData = data.products || [];
+                    document.getElementById('last-updated').innerText = new Date(data.updatedAt).toLocaleString('fr-FR');
+                    
+                    const firstWithRate = stockData.find(p => p.rate != null && p.rate > 0);
+                    if (firstWithRate) {
+                        globalRate = firstWithRate.rate;
+                        document.getElementById('rate-value').textContent = fmt(globalRate);
+                        document.getElementById('rate-banner').classList.remove('hidden');
+                    }
+                    renderStock();
+                    renderPrices(); // Re-render prices if rate changes
                 }
-                renderStock();
             }
+        } catch (e) { console.error('Stock load error', e); }
 
-            // Load Net Prices (Excel)
+        // 2. Load Net Prices (Excel)
+        try {
             const resPrices = await fetch('net_prices.json?t=' + new Date().getTime(), { cache: 'no-store' });
             if (resPrices.ok) {
-                const data = await resPrices.json();
-                priceData = data.prices || [];
-                renderPrices();
+                const text = await resPrices.text();
+                if (text !== lastRawPrices) {
+                    lastRawPrices = text;
+                    const data = JSON.parse(text);
+                    priceData = data.prices || [];
+                    renderPrices();
+                }
             }
-        } catch (e) {
-            console.error('Data load error', e);
-        }
+        } catch (e) { console.error('Prices load error', e); }
     }
 
     // --- RENDER STOCK ---
     function renderStock() {
         const term = document.getElementById('search').value.toLowerCase();
-        const filtered = stockData.filter(i => 
-            !term || (i.sap + i.article + i.description).toLowerCase().includes(term)
-        );
+        const cat = document.getElementById('filter-category').value;
+        const stat = document.getElementById('filter-status').value;
 
-        const fmtHtml = (i) => `
-            <td class="px-4 py-3">${esc(i.sap)}</td>
-            <td class="px-4 py-3 font-medium">${esc(i.article)}</td>
-            <td class="px-4 py-3 text-slate-500">${esc(i.description)}</td>
-            <td class="px-4 py-3 text-center font-bold ${i.availableQuantity > 0 ? 'text-green-700' : 'text-red-600'}">${i.availableQuantity}</td>
-            <td class="px-4 py-3 text-right text-blue-700 font-semibold">${fmt(i.sellingPriceDA)} DA</td>
-        `;
+        const filtered = stockData.filter(i => {
+            const matchTerm = !term || (i.sap + i.article + i.description).toLowerCase().includes(term);
+            const matchCat = !cat || i.category === cat;
+            const matchStat = !stat || i.status === stat;
+            return matchTerm && matchCat && matchStat;
+        });
 
-        document.getElementById('stock-body').innerHTML = filtered.map(i => `<tr>${fmtHtml(i)}</tr>`).join('');
-        document.getElementById('stock-cards').innerHTML = filtered.map(i => `
+        document.getElementById('stock-body').innerHTML = filtered.map(item => `
+            <tr class="hover:bg-slate-50 transition-colors">
+                <td class="px-2 xl:px-4 py-3 font-medium text-slate-700">${esc(item.sap)}</td>
+                <td class="px-2 xl:px-4 py-3 font-medium">${esc(item.article)}</td>
+                <td class="px-2 xl:px-4 py-3 text-slate-500">${esc(item.description) || '-'}</td>
+                <td class="px-2 xl:px-4 py-3">${item.category ? `<span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded border">${esc(item.category)}</span>` : '-'}</td>
+                <td class="px-2 xl:px-4 py-3 text-center font-semibold bg-blue-50/50">${esc(item.totalQuantity)}</td>
+                <td class="px-2 xl:px-4 py-3 text-center text-slate-500">${esc(item.soldQuantity) || '-'}</td>
+                <td class="px-2 xl:px-4 py-3 text-center text-orange-500">${esc(item.reservedQuantity) || '-'}</td>
+                <td class="px-2 xl:px-4 py-3 text-center font-bold text-green-700 bg-green-50/50">${esc(item.availableQuantity)}</td>
+                <td class="px-2 xl:px-4 py-3 text-center">
+                    ${item.status === 'inStock' ? '<span class="px-2 py-1 rounded text-xs font-semibold bg-green-100 text-green-700">En Stock</span>' : 
+                      item.status === 'lowStock' ? '<span class="px-2 py-1 rounded text-xs font-semibold bg-yellow-100 text-yellow-700">Stock Faible</span>' : 
+                      '<span class="px-2 py-1 rounded text-xs font-semibold bg-red-100 text-red-700">Rupture</span>'}
+                </td>
+                <td class="px-2 xl:px-4 py-3 text-right text-red-600 font-medium">€${fmt(item.initialPriceEuro)}</td>
+                <td class="px-2 xl:px-4 py-3 text-right text-slate-700">€${fmt(item.netPriceEuro)}</td>
+                <td class="px-2 xl:px-4 py-3 text-right text-blue-700 font-semibold bg-blue-50/50">${fmt(getSellingPriceDA(item))} DA</td>
+                <td class="px-2 xl:px-4 py-3 text-slate-500">${esc(item.position) || '-'}</td>
+            </tr>
+        `).join('');
+
+        document.getElementById('stock-cards').innerHTML = filtered.map(item => `
             <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
                 <div class="flex justify-between items-start">
-                    <div><div class="font-bold">${esc(i.article)}</div><div class="text-xs text-slate-500">SAP: ${esc(i.sap)}</div></div>
-                    <div class="text-green-700 font-bold">${i.availableQuantity} dispo</div>
+                    <div><div class="font-bold">${esc(item.article)}</div><div class="text-xs text-slate-500">SAP: ${esc(item.sap)}</div></div>
+                    <div class="font-bold text-green-700">${item.availableQuantity} dispo</div>
                 </div>
-                <div class="mt-2 text-sm text-slate-500">${esc(i.description)}</div>
-                <div class="mt-2 text-right text-blue-700 font-bold">${fmt(i.sellingPriceDA)} DA</div>
+                <div class="mt-2 text-sm text-slate-500">${esc(item.description)}</div>
+                <div class="mt-3 flex justify-between items-center border-t pt-2 text-sm">
+                    <div>Net: <span class="font-medium">€${fmt(item.netPriceEuro)}</span></div>
+                    <div class="text-blue-700 font-bold">${fmt(getSellingPriceDA(item))} DA</div>
+                </div>
             </div>
         `).join('');
     }
 
-    // --- RENDER PRICES (Excel) ---
+    // --- RENDER PRICES (EXCEL) ---
     function renderPrices() {
         const term = document.getElementById('search-prices').value.toLowerCase();
-        const filtered = priceData.filter(i => 
-            !term || (i.sap + i.article + i.description).toLowerCase().includes(term)
-        );
+        const filtered = priceData.filter(i => !term || (i.sap + i.article + i.description).toLowerCase().includes(term));
 
-        const calcDA = (net) => net * globalRate;
+        document.getElementById('prices-body').innerHTML = filtered.map(i => `
+            <tr class="hover:bg-slate-50 transition-colors">
+                <td class="px-4 py-3 font-medium text-slate-700">${esc(i.sap)}</td>
+                <td class="px-4 py-3 font-medium">${esc(i.article)}</td>
+                <td class="px-4 py-3 text-slate-500">${esc(i.description)}</td>
+                <td class="px-4 py-3 text-right text-slate-700">€${fmt(i.netPriceEuro)}</td>
+                <td class="px-4 py-3 text-right text-blue-700 font-bold bg-blue-50/50">${fmt(i.netPriceEuro * globalRate)} DA</td>
+            </tr>
+        `).join('');
 
-        const fmtHtml = (i) => `
-            <td class="px-4 py-3">${esc(i.sap)}</td>
-            <td class="px-4 py-3 font-medium">${esc(i.article)}</td>
-            <td class="px-4 py-3 text-slate-500">${esc(i.description)}</td>
-            <td class="px-4 py-3 text-right text-slate-700">€${fmt(i.netPriceEuro)}</td>
-            <td class="px-4 py-3 text-right bg-blue-50 text-blue-700 font-bold">${fmt(calcDA(i.netPriceEuro))} DA</td>
-        `;
-
-        document.getElementById('prices-body').innerHTML = filtered.map(i => `<tr>${fmtHtml(i)}</tr>`).join('');
         document.getElementById('prices-cards').innerHTML = filtered.map(i => `
             <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
                 <div class="font-bold">${esc(i.article)}</div>
@@ -219,7 +270,7 @@
                 <div class="text-sm text-slate-500 mb-3">${esc(i.description)}</div>
                 <div class="flex justify-between items-center border-t pt-2 text-sm">
                     <div>Net: <span class="font-medium">€${fmt(i.netPriceEuro)}</span></div>
-                    <div class="text-blue-700 font-bold">${fmt(calcDA(i.netPriceEuro))} DA</div>
+                    <div class="text-blue-700 font-bold">${fmt(i.netPriceEuro * globalRate)} DA</div>
                 </div>
             </div>
         `).join('');
@@ -228,8 +279,17 @@
     // Event Listeners
     document.getElementById('search').addEventListener('input', renderStock);
     document.getElementById('search-prices').addEventListener('input', renderPrices);
+    document.getElementById('filter-category').addEventListener('change', renderStock);
+    document.getElementById('filter-status').addEventListener('change', renderStock);
+    
+    document.getElementById('btn-reset').addEventListener('click', () => {
+        document.getElementById('search').value = '';
+        document.getElementById('filter-category').value = '';
+        document.getElementById('filter-status').value = '';
+        renderStock();
+    });
 
-    // Initial Load
+    // Init
     loadData();
     setInterval(loadData, 60000);
 </script>
