@@ -1,4 +1,24 @@
 {
-  "updatedAt": "2026-10-22T21:14:21.318Z",
-  "products": []
+  "updatedAt": "2026-10-22T22:05:47.106Z",
+  "products": [
+    {
+      "id": "cmvk3cl890001x8utgw6agpoc",
+      "sap": "fgfgf",
+      "article": "23423423",
+      "description": "wefwefwefwef",
+      "category": "ddd",
+      "totalQuantity": 1,
+      "soldQuantity": 0,
+      "reservedQuantity": 0,
+      "availableQuantity": 1,
+      "status": "lowStock",
+      "initialPriceEuro": 200,
+      "netPriceEuro": 200,
+      "rate": 1,
+      "sellingPriceDA": 200,
+      "position": "a23",
+      "orderDate": "2026-10-22T00:00:00.000Z",
+      "hasReservation": false
+    }
+  ]
 }
