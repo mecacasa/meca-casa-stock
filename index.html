@@ -37,7 +37,7 @@
         </div>
     </div>
 
-    <!-- ================= TAB 1: STOCK (YOUR ORIGINAL CODE) ================= -->
+    <!-- ================= TAB 1: STOCK ================= -->
     <div id="view-stock">
         <div class="p-3 sm:p-4 bg-slate-50 border-b border-slate-200 sticky top-0 z-20 md:static">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -121,10 +121,11 @@
         </div>
 
         <div id="stock-cards" class="lg:hidden p-3 space-y-3 md:space-y-0 md:grid md:grid-cols-2 md:gap-3 bg-slate-50"></div>
+        <div id="stock-pagination"></div> <!-- PAGINATION STOCK -->
         <div id="empty-state" class="hidden p-10 sm:p-12 text-center text-slate-500 text-sm">Aucun produit.</div>
     </div>
 
-    <!-- ================= TAB 2: NET PRICES (NEW LIST) ================= -->
+    <!-- ================= TAB 2: NET PRICES ================= -->
     <div id="view-prices" class="hidden">
         <div class="p-3 sm:p-4 bg-slate-50 border-b border-slate-200 sticky top-0 z-20 md:static">
             <div class="w-full max-w-md">
@@ -133,7 +134,6 @@
             </div>
         </div>
 
-        <!-- Desktop Table -->
         <div class="hidden lg:block overflow-x-auto">
             <table class="w-full text-left text-xs xl:text-sm">
                 <thead class="bg-slate-100 text-slate-600 border-b border-slate-200">
@@ -149,8 +149,8 @@
             </table>
         </div>
 
-        <!-- Mobile Cards -->
         <div id="prices-cards" class="lg:hidden p-3 space-y-3 bg-slate-50"></div>
+        <div id="prices-pagination"></div> <!-- PAGINATION PRICES -->
     </div>
 
 </div>
@@ -164,6 +164,13 @@
     
     const DEFAULT_FILTERS = { search: '', category: '', status: '', position: '', date: 'all', reservation: 'any' };
     let filters = { ...DEFAULT_FILTERS };
+
+    // --- PAGINATION STATE ---
+    const ITEMS_PER_PAGE = 50; // 50 items per page for maximum speed
+    let currentStockPage = 1;
+    let currentPricePage = 1;
+    let filteredStockData = [];
+    let filteredPriceData = [];
 
     // --- TABS LOGIC ---
     const btnStock = document.getElementById('tab-btn-stock');
@@ -191,8 +198,7 @@
         const net = Number(item.netPriceEuro) || 0;
         const init = Number(item.initialPriceEuro) || 0;
         const rate = Number(item.rate) || 1;
-        const eff = Math.max(net, init);
-        return eff * rate;
+        return Math.max(net, init) * rate;
     }
 
     function prepareData() {
@@ -203,9 +209,44 @@
         });
     }
 
+    // --- PAGINATION HELPER ---
+    function renderPagination(containerId, totalItems, currentPage, onPageChange) {
+        const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+        const container = document.getElementById(containerId);
+        
+        if (totalPages <= 1) { container.innerHTML = ''; return; }
+
+        const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
+        const endItem = Math.min(currentPage * ITEMS_PER_PAGE, totalItems);
+
+        let html = '<div class="flex items-center justify-between px-4 py-3 bg-white border-t border-slate-200 sm:px-6">';
+        html += `<div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">`;
+        html += `<div><p class="text-sm text-slate-700">Affichage de <span class="font-medium">${startItem}</span> à <span class="font-medium">${endItem}</span> sur <span class="font-medium">${totalItems}</span> résultats</p></div>`;
+        html += `<div><nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">`;
+        
+        // Prev Button
+        html += `<button data-page="${currentPage - 1}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-slate-300 bg-white text-sm font-medium text-slate-500 hover:bg-slate-50 ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'pagination-btn'}">Précédent</button>`;
+        
+        // Page Indicator
+        html += `<span class="relative inline-flex items-center px-4 py-2 border border-slate-300 bg-white text-sm font-medium text-slate-700">Page ${currentPage} sur ${totalPages}</span>`;
+        
+        // Next Button
+        html += `<button data-page="${currentPage + 1}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-slate-300 bg-white text-sm font-medium text-slate-500 hover:bg-slate-50 ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'pagination-btn'}">Suivant</button>`;
+        
+        html += `</nav></div></div></div>`;
+        container.innerHTML = html;
+
+        // Attach Events
+        container.querySelectorAll('.pagination-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                onPageChange(parseInt(e.target.getAttribute('data-page')));
+            });
+        });
+    }
+
     let lastRendered = [];
     const tableMq = window.matchMedia('(min-width: 1024px)');
-    tableMq.addEventListener('change', () => { if (allStockData.length) renderTable(lastRendered); });
+    tableMq.addEventListener('change', () => { if (allStockData.length) renderTable(); });
 
     function updateGlobalRate() {
         const firstWithRate = allStockData.find(p => p.rate != null && p.rate > 0);
@@ -232,7 +273,6 @@
                     populateDropdown('filter-category', [...new Set(allStockData.map(i => i.category).filter(Boolean))]);
                     populateDropdown('filter-position', [...new Set(allStockData.map(i => i.position).filter(Boolean))]);
                     applyFilters();
-                    renderPrices(); // Update prices if rate changed
                 }
             }
         } catch (e) { console.error('Stock error', e); }
@@ -246,7 +286,7 @@
                     lastRawPrices = text;
                     const data = JSON.parse(text);
                     priceData = data.prices || [];
-                    renderPrices();
+                    filterPrices(); // Trigger filter and render
                 }
             }
         } catch (e) { console.error('Prices error', e); }
@@ -263,12 +303,14 @@
         select.value = currentVal;
     }
 
+    // --- FILTER & RENDER STOCK ---
     function applyFilters() {
+        currentStockPage = 1; // Reset to page 1 on filter
         const now = new Date().getTime();
         const dayMs = 24 * 60 * 60 * 1000;
         const term = filters.search.toLowerCase();
 
-        const filtered = allStockData.filter(item => {
+        filteredStockData = allStockData.filter(item => {
             const matchSearch = !term || item._search.includes(term);
             const matchCategory = !filters.category || item.category === filters.category;
             const matchStatus = !filters.status || item.status === filters.status;
@@ -292,8 +334,8 @@
         });
 
         updateFilterBadge();
-        document.getElementById('result-count').textContent = `${filtered.length} produit${filtered.length > 1 ? 's' : ''}`;
-        renderTable(filtered);
+        document.getElementById('result-count').textContent = `${filteredStockData.length} produit${filteredStockData.length > 1 ? 's' : ''}`;
+        renderTable();
     }
 
     function updateFilterBadge() {
@@ -314,19 +356,25 @@
         return `<span class="whitespace-nowrap px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 border border-red-200">Rupture</span>`;
     }
 
-    function renderTable(data) {
-        lastRendered = data;
+    function renderTable() {
         const tbody = document.getElementById('stock-body');
         const cards = document.getElementById('stock-cards');
         const empty = document.getElementById('empty-state');
+        const pagContainer = document.getElementById('stock-pagination');
 
-        if (data.length === 0) {
-            tbody.innerHTML = ''; cards.innerHTML = ''; empty.classList.remove('hidden'); return;
+        if (filteredStockData.length === 0) {
+            tbody.innerHTML = ''; cards.innerHTML = ''; pagContainer.innerHTML = '';
+            empty.classList.remove('hidden'); return;
         }
         empty.classList.add('hidden');
         const wide = tableMq.matches;
 
-        tbody.innerHTML = !wide ? '' : data.map(item => `
+        // 1. Slice Data for current page
+        const startIdx = (currentStockPage - 1) * ITEMS_PER_PAGE;
+        const pageData = filteredStockData.slice(startIdx, startIdx + ITEMS_PER_PAGE);
+
+        // 2. Render Table
+        tbody.innerHTML = !wide ? '' : pageData.map(item => `
             <tr class="hover:bg-slate-50 transition-colors">
                 <td class="px-2 xl:px-4 py-3 font-medium text-slate-700">${esc(item.sap)}</td>
                 <td class="px-2 xl:px-4 py-3 font-medium">${esc(item.article)}</td>
@@ -343,7 +391,8 @@
                 <td class="px-2 xl:px-4 py-3 text-slate-500">${esc(item.position) || '-'}</td>
             </tr>`).join('');
 
-        cards.innerHTML = wide ? '' : data.map(item => `
+        // 3. Render Mobile Cards
+        cards.innerHTML = wide ? '' : pageData.map(item => `
             <article class="bg-white rounded-lg border border-slate-200 shadow-sm p-3">
                 <div class="flex items-start justify-between gap-2">
                     <div class="min-w-0">
@@ -368,14 +417,39 @@
                     <div><span class="text-xs text-slate-500">Vente unit. </span><span class="text-blue-600 font-semibold">${fmt(item._sellingPriceDA)} DA</span></div>
                 </div>
             </article>`).join('');
+
+        // 4. Render Pagination
+        renderPagination('stock-pagination', filteredStockData.length, currentStockPage, (newPage) => {
+            currentStockPage = newPage;
+            renderTable();
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top
+        });
     }
 
-    // --- RENDER PRICES (NEW LIST) ---
-    function renderPrices() {
+    // --- FILTER & RENDER PRICES ---
+    function filterPrices() {
+        currentPricePage = 1; // Reset to page 1
         const term = document.getElementById('search-prices').value.toLowerCase();
-        const filtered = priceData.filter(i => !term || (i.sap + i.article + i.description).toLowerCase().includes(term));
+        filteredPriceData = priceData.filter(i => !term || (i.sap + i.article + i.description).toLowerCase().includes(term));
+        renderPrices();
+    }
 
-        document.getElementById('prices-body').innerHTML = filtered.map(i => `
+    function renderPrices() {
+        const tbody = document.getElementById('prices-body');
+        const cards = document.getElementById('prices-cards');
+        
+        if (filteredPriceData.length === 0) {
+            tbody.innerHTML = ''; cards.innerHTML = '';
+            document.getElementById('prices-pagination').innerHTML = '';
+            return;
+        }
+
+        // 1. Slice Data for current page
+        const startIdx = (currentPricePage - 1) * ITEMS_PER_PAGE;
+        const pageData = filteredPriceData.slice(startIdx, startIdx + ITEMS_PER_PAGE);
+
+        // 2. Render Table
+        tbody.innerHTML = pageData.map(i => `
             <tr class="hover:bg-slate-50 transition-colors">
                 <td class="px-4 py-3 font-medium text-slate-700">${esc(i.sap)}</td>
                 <td class="px-4 py-3 font-medium">${esc(i.article)}</td>
@@ -385,7 +459,8 @@
             </tr>
         `).join('');
 
-        document.getElementById('prices-cards').innerHTML = filtered.map(i => `
+        // 3. Render Mobile Cards
+        cards.innerHTML = pageData.map(i => `
             <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
                 <div class="font-bold">${esc(i.article)}</div>
                 <div class="text-xs text-slate-500 mb-2">SAP: ${esc(i.sap)}</div>
@@ -396,6 +471,13 @@
                 </div>
             </div>
         `).join('');
+
+        // 4. Render Pagination
+        renderPagination('prices-pagination', filteredPriceData.length, currentPricePage, (newPage) => {
+            currentPricePage = newPage;
+            renderPrices();
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top
+        });
     }
 
     // Event Listeners
@@ -409,7 +491,13 @@
     document.getElementById('filter-position').addEventListener('change', (e) => { filters.position = e.target.value; applyFilters(); });
     document.getElementById('filter-date').addEventListener('change', (e) => { filters.date = e.target.value; applyFilters(); });
     document.getElementById('filter-reservation').addEventListener('change', (e) => { filters.reservation = e.target.value; applyFilters(); });
-    document.getElementById('search-prices').addEventListener('input', renderPrices);
+    
+    // PRICES SEARCH with debounce
+    let priceSearchTimer;
+    document.getElementById('search-prices').addEventListener('input', () => {
+        clearTimeout(priceSearchTimer);
+        priceSearchTimer = setTimeout(() => { filterPrices(); }, 150);
+    });
 
     document.getElementById('btn-toggle-filters').addEventListener('click', (e) => {
         const panel = document.getElementById('filter-extra');
