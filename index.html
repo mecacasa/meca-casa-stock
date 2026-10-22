@@ -8,62 +8,95 @@
     <style>
         .overflow-x-auto::-webkit-scrollbar { height: 8px; }
         .overflow-x-auto::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .overflow-x-auto::-webkit-scrollbar-track { background: #f1f5f9; }
         @media (max-width: 767px) { input, select { font-size: 16px !important; } }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans p-0 sm:p-4 md:p-8">
 
 <div class="w-full md:max-w-[95%] mx-auto bg-white sm:rounded-xl shadow-lg border border-slate-200 overflow-hidden">
-
+    
     <!-- Header -->
     <div class="bg-[#1a5c37] px-4 py-4 sm:px-6 sm:py-5 text-white flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
         <div>
             <h1 class="text-xl sm:text-2xl font-bold tracking-tight">Meca-Casa</h1>
             
-            <!-- TABS -->
+            <!-- THE TABS -->
             <div class="flex gap-2 mt-3">
                 <button id="tab-btn-stock" class="px-4 py-1.5 rounded-full text-sm font-semibold bg-white text-[#1a5c37] transition-colors shadow-sm">Disponibilité</button>
                 <button id="tab-btn-prices" class="px-4 py-1.5 rounded-full text-sm font-semibold bg-white/20 text-white hover:bg-white/30 transition-colors">Liste des Prix</button>
             </div>
-        </div>
-        <div class="text-xs text-green-100 sm:text-right flex flex-col sm:items-end">
-            <div id="rate-banner" class="hidden mb-2 px-3 py-1 bg-white/15 rounded-full text-xs font-medium inline-block">
+
+            <div id="rate-banner" class="hidden mt-3 px-3 py-1 bg-white/15 rounded-full text-xs font-medium inline-block">
                 Taux actuel : <span id="rate-value" class="font-mono">-</span> DA
             </div>
+        </div>
+        <div class="text-xs text-green-100 sm:text-right flex gap-1.5 sm:block">
             <div>Dernière mise à jour :</div>
             <div id="last-updated" class="font-mono font-medium">Chargement...</div>
         </div>
     </div>
 
-    <!-- ================= TAB 1: STOCK ================= -->
+    <!-- ================= TAB 1: STOCK (YOUR ORIGINAL CODE) ================= -->
     <div id="view-stock">
-        <!-- Filters -->
         <div class="p-3 sm:p-4 bg-slate-50 border-b border-slate-200 sticky top-0 z-20 md:static">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 <div class="sm:col-span-2 lg:col-span-1">
-                    <label class="block text-xs font-semibold text-slate-500 mb-1">Recherche</label>
-                    <input type="search" id="search" placeholder="SAP, Article, Desc..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-[#1a5c37]">
+                    <label for="search" class="block text-xs font-semibold text-slate-500 mb-1">Recherche</label>
+                    <div class="flex gap-2">
+                        <input type="search" id="search" placeholder="SAP, Article, Desc..." class="flex-1 min-w-0 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1a5c37] text-sm">
+                        <button id="btn-toggle-filters" type="button" class="md:hidden shrink-0 px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm font-medium text-slate-700 active:bg-slate-100">
+                            Filtres <span id="filter-count" class="hidden ml-1 px-1.5 py-0.5 bg-[#1a5c37] text-white text-xs rounded-full"></span>
+                        </button>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 mb-1">Catégorie</label>
-                    <select id="filter-category" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white"><option value="">Toutes</option></select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 mb-1">Statut</label>
-                    <select id="filter-status" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
-                        <option value="">Tous</option>
-                        <option value="inStock">En Stock</option>
-                        <option value="lowStock">Stock Faible</option>
-                        <option value="outOfStock">Rupture</option>
-                    </select>
-                </div>
-                <div class="flex items-end">
-                    <button id="btn-reset" class="w-full px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium rounded-lg text-sm transition-colors">Réinitialiser</button>
+
+                <div id="filter-extra" class="contents max-md:hidden">
+                    <div>
+                        <label for="filter-category" class="block text-xs font-semibold text-slate-500 mb-1">Catégorie</label>
+                        <select id="filter-category" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white"><option value="">Toutes les catégories</option></select>
+                    </div>
+                    <div>
+                        <label for="filter-status" class="block text-xs font-semibold text-slate-500 mb-1">Statut</label>
+                        <select id="filter-status" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
+                            <option value="">Tous les statuts</option>
+                            <option value="inStock">En Stock</option>
+                            <option value="lowStock">Stock Faible</option>
+                            <option value="outOfStock">Rupture</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="filter-position" class="block text-xs font-semibold text-slate-500 mb-1">Position</label>
+                        <select id="filter-position" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white"><option value="">Toutes les positions</option></select>
+                    </div>
+                    <div>
+                        <label for="filter-date" class="block text-xs font-semibold text-slate-500 mb-1">Date de commande</label>
+                        <select id="filter-date" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
+                            <option value="all">Tout le temps</option>
+                            <option value="7d">7 derniers jours</option>
+                            <option value="30d">30 derniers jours</option>
+                            <option value="90d">90 derniers jours</option>
+                            <option value="6m">6 derniers mois</option>
+                            <option value="1y">Dernière année</option>
+                            <option value="older">Plus d'un an</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="filter-reservation" class="block text-xs font-semibold text-slate-500 mb-1">A une réservation</label>
+                        <select id="filter-reservation" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
+                            <option value="any">Tous</option>
+                            <option value="yes">Oui</option>
+                            <option value="no">Non</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button id="btn-reset" class="w-full px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium rounded-lg text-sm transition-colors">Réinitialiser</button>
+                    </div>
                 </div>
             </div>
+            <div id="result-count" class="mt-2 text-xs text-slate-500 lg:hidden"></div>
         </div>
 
-        <!-- Desktop Table (Detailed) -->
         <div class="hidden lg:block overflow-x-auto">
             <table class="w-full text-left text-xs xl:text-sm">
                 <thead class="bg-slate-100 text-slate-600 border-b border-slate-200">
@@ -75,11 +108,11 @@
                         <th class="px-2 xl:px-4 py-3 font-semibold text-center bg-blue-50">Qté</th>
                         <th class="px-2 xl:px-4 py-3 font-semibold text-center">Vendu</th>
                         <th class="px-2 xl:px-4 py-3 font-semibold text-center">Réservé</th>
-                        <th class="px-2 xl:px-4 py-3 font-semibold text-center bg-green-50">Dispo</th>
+                        <th class="px-2 xl:px-4 py-3 font-semibold text-center bg-green-50">Disponible</th>
                         <th class="px-2 xl:px-4 py-3 font-semibold text-center">Statut</th>
                         <th class="px-2 xl:px-4 py-3 font-semibold text-right">Prix Init (€)</th>
                         <th class="px-2 xl:px-4 py-3 font-semibold text-right">Prix Net (€)</th>
-                        <th class="px-2 xl:px-4 py-3 font-semibold text-right bg-blue-50">Prix Vente (DA)</th>
+                        <th class="px-2 xl:px-4 py-3 font-semibold text-right bg-blue-50">Prix Vente Unit. (DA)</th>
                         <th class="px-2 xl:px-4 py-3 font-semibold">Position</th>
                     </tr>
                 </thead>
@@ -87,13 +120,13 @@
             </table>
         </div>
 
-        <!-- Mobile Cards -->
-        <div id="stock-cards" class="lg:hidden p-3 space-y-3 bg-slate-50"></div>
+        <div id="stock-cards" class="lg:hidden p-3 space-y-3 md:space-y-0 md:grid md:grid-cols-2 md:gap-3 bg-slate-50"></div>
+        <div id="empty-state" class="hidden p-10 sm:p-12 text-center text-slate-500 text-sm">Aucun produit.</div>
     </div>
 
-    <!-- ================= TAB 2: NET PRICES ================= -->
+    <!-- ================= TAB 2: NET PRICES (NEW LIST) ================= -->
     <div id="view-prices" class="hidden">
-        <div class="p-3 sm:p-4 bg-slate-50 border-b border-slate-200">
+        <div class="p-3 sm:p-4 bg-slate-50 border-b border-slate-200 sticky top-0 z-20 md:static">
             <div class="w-full max-w-md">
                 <label class="block text-xs font-semibold text-slate-500 mb-1">Recherche dans les prix</label>
                 <input type="search" id="search-prices" placeholder="SAP, Article, Desc..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-[#1a5c37]">
@@ -120,15 +153,17 @@
         <div id="prices-cards" class="lg:hidden p-3 space-y-3 bg-slate-50"></div>
     </div>
 
-    <div id="empty-state" class="hidden p-10 text-center text-slate-500 text-sm">Aucune donnée disponible.</div>
 </div>
 
 <script>
-    let stockData = [];
+    let allStockData = [];
     let priceData = [];
     let globalRate = 1;
     let lastRawStock = null;
     let lastRawPrices = null;
+    
+    const DEFAULT_FILTERS = { search: '', category: '', status: '', position: '', date: 'all', reservation: 'any' };
+    let filters = { ...DEFAULT_FILTERS };
 
     // --- TABS LOGIC ---
     const btnStock = document.getElementById('tab-btn-stock');
@@ -156,34 +191,53 @@
         const net = Number(item.netPriceEuro) || 0;
         const init = Number(item.initialPriceEuro) || 0;
         const rate = Number(item.rate) || 1;
-        return Math.max(net, init) * rate;
+        const eff = Math.max(net, init);
+        return eff * rate;
+    }
+
+    function prepareData() {
+        allStockData.forEach(item => {
+            item._search = ((item.sap || '') + '\n' + (item.article || '') + '\n' + (item.description || '')).toLowerCase();
+            item._orderTime = item.orderDate ? new Date(item.orderDate).getTime() : null;
+            item._sellingPriceDA = getSellingPriceDA(item);
+        });
+    }
+
+    let lastRendered = [];
+    const tableMq = window.matchMedia('(min-width: 1024px)');
+    tableMq.addEventListener('change', () => { if (allStockData.length) renderTable(lastRendered); });
+
+    function updateGlobalRate() {
+        const firstWithRate = allStockData.find(p => p.rate != null && p.rate > 0);
+        if (firstWithRate) {
+            globalRate = firstWithRate.rate;
+            document.getElementById('rate-value').textContent = fmt(globalRate);
+            document.getElementById('rate-banner').classList.remove('hidden');
+        }
     }
 
     async function loadData() {
-        // 1. Load Stock Data
+        // 1. Fetch Stock
         try {
-            const resStock = await fetch('stock.json?t=' + new Date().getTime(), { cache: 'no-store' });
-            if (resStock.ok) {
-                const text = await resStock.text();
+            const response = await fetch('stock.json?t=' + new Date().getTime(), { cache: 'no-store' });
+            if (response.ok) {
+                const text = await response.text();
                 if (text !== lastRawStock) {
                     lastRawStock = text;
                     const data = JSON.parse(text);
-                    stockData = data.products || [];
+                    allStockData = data.products || [];
+                    prepareData();
+                    updateGlobalRate();
                     document.getElementById('last-updated').innerText = new Date(data.updatedAt).toLocaleString('fr-FR');
-                    
-                    const firstWithRate = stockData.find(p => p.rate != null && p.rate > 0);
-                    if (firstWithRate) {
-                        globalRate = firstWithRate.rate;
-                        document.getElementById('rate-value').textContent = fmt(globalRate);
-                        document.getElementById('rate-banner').classList.remove('hidden');
-                    }
-                    renderStock();
-                    renderPrices(); // Re-render prices if rate changes
+                    populateDropdown('filter-category', [...new Set(allStockData.map(i => i.category).filter(Boolean))]);
+                    populateDropdown('filter-position', [...new Set(allStockData.map(i => i.position).filter(Boolean))]);
+                    applyFilters();
+                    renderPrices(); // Update prices if rate changed
                 }
             }
-        } catch (e) { console.error('Stock load error', e); }
+        } catch (e) { console.error('Stock error', e); }
 
-        // 2. Load Net Prices (Excel)
+        // 2. Fetch Net Prices
         try {
             const resPrices = await fetch('net_prices.json?t=' + new Date().getTime(), { cache: 'no-store' });
             if (resPrices.ok) {
@@ -195,60 +249,128 @@
                     renderPrices();
                 }
             }
-        } catch (e) { console.error('Prices load error', e); }
+        } catch (e) { console.error('Prices error', e); }
     }
 
-    // --- RENDER STOCK ---
-    function renderStock() {
-        const term = document.getElementById('search').value.toLowerCase();
-        const cat = document.getElementById('filter-category').value;
-        const stat = document.getElementById('filter-status').value;
+    function populateDropdown(id, values) {
+        const select = document.getElementById(id);
+        const currentVal = select.value;
+        select.innerHTML = select.options[0].outerHTML;
+        values.sort().forEach(val => {
+            const opt = document.createElement('option');
+            opt.value = val; opt.textContent = val; select.appendChild(opt);
+        });
+        select.value = currentVal;
+    }
 
-        const filtered = stockData.filter(i => {
-            const matchTerm = !term || (i.sap + i.article + i.description).toLowerCase().includes(term);
-            const matchCat = !cat || i.category === cat;
-            const matchStat = !stat || i.status === stat;
-            return matchTerm && matchCat && matchStat;
+    function applyFilters() {
+        const now = new Date().getTime();
+        const dayMs = 24 * 60 * 60 * 1000;
+        const term = filters.search.toLowerCase();
+
+        const filtered = allStockData.filter(item => {
+            const matchSearch = !term || item._search.includes(term);
+            const matchCategory = !filters.category || item.category === filters.category;
+            const matchStatus = !filters.status || item.status === filters.status;
+            const matchPosition = !filters.position || item.position === filters.position;
+            let matchReservation = true;
+            if (filters.reservation === 'yes') matchReservation = item.hasReservation === true;
+            if (filters.reservation === 'no') matchReservation = item.hasReservation === false;
+            let matchDate = true;
+            if (filters.date !== 'all' && item._orderTime !== null) {
+                const age = now - item._orderTime;
+                if (filters.date === '7d') matchDate = age <= 7 * dayMs;
+                if (filters.date === '30d') matchDate = age <= 30 * dayMs;
+                if (filters.date === '90d') matchDate = age <= 90 * dayMs;
+                if (filters.date === '6m') matchDate = age <= 180 * dayMs;
+                if (filters.date === '1y') matchDate = age <= 365 * dayMs;
+                if (filters.date === 'older') matchDate = age > 365 * dayMs;
+            } else if (filters.date !== 'all' && item._orderTime === null) {
+                matchDate = false;
+            }
+            return matchSearch && matchCategory && matchStatus && matchPosition && matchReservation && matchDate;
         });
 
-        document.getElementById('stock-body').innerHTML = filtered.map(item => `
+        updateFilterBadge();
+        document.getElementById('result-count').textContent = `${filtered.length} produit${filtered.length > 1 ? 's' : ''}`;
+        renderTable(filtered);
+    }
+
+    function updateFilterBadge() {
+        let n = 0;
+        if (filters.category) n++;
+        if (filters.status) n++;
+        if (filters.position) n++;
+        if (filters.date !== 'all') n++;
+        if (filters.reservation !== 'any') n++;
+        const badge = document.getElementById('filter-count');
+        badge.textContent = n;
+        badge.classList.toggle('hidden', n === 0);
+    }
+
+    function statusBadge(status) {
+        if (status === 'inStock') return `<span class="whitespace-nowrap px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 border border-green-200">En Stock</span>`;
+        if (status === 'lowStock') return `<span class="whitespace-nowrap px-2.5 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700 border border-yellow-200">Stock Faible</span>`;
+        return `<span class="whitespace-nowrap px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 border border-red-200">Rupture</span>`;
+    }
+
+    function renderTable(data) {
+        lastRendered = data;
+        const tbody = document.getElementById('stock-body');
+        const cards = document.getElementById('stock-cards');
+        const empty = document.getElementById('empty-state');
+
+        if (data.length === 0) {
+            tbody.innerHTML = ''; cards.innerHTML = ''; empty.classList.remove('hidden'); return;
+        }
+        empty.classList.add('hidden');
+        const wide = tableMq.matches;
+
+        tbody.innerHTML = !wide ? '' : data.map(item => `
             <tr class="hover:bg-slate-50 transition-colors">
                 <td class="px-2 xl:px-4 py-3 font-medium text-slate-700">${esc(item.sap)}</td>
                 <td class="px-2 xl:px-4 py-3 font-medium">${esc(item.article)}</td>
-                <td class="px-2 xl:px-4 py-3 text-slate-500">${esc(item.description) || '-'}</td>
-                <td class="px-2 xl:px-4 py-3">${item.category ? `<span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded border">${esc(item.category)}</span>` : '-'}</td>
+                <td class="px-2 xl:px-4 py-3 text-slate-500 min-w-[120px] break-words" title="${esc(item.description)}">${esc(item.description) || '-'}</td>
+                <td class="px-2 xl:px-4 py-3">${item.category ? `<span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded border border-slate-200">${esc(item.category)}</span>` : '-'}</td>
                 <td class="px-2 xl:px-4 py-3 text-center font-semibold bg-blue-50/50">${esc(item.totalQuantity)}</td>
                 <td class="px-2 xl:px-4 py-3 text-center text-slate-500">${esc(item.soldQuantity) || '-'}</td>
                 <td class="px-2 xl:px-4 py-3 text-center text-orange-500">${esc(item.reservedQuantity) || '-'}</td>
                 <td class="px-2 xl:px-4 py-3 text-center font-bold text-green-700 bg-green-50/50">${esc(item.availableQuantity)}</td>
-                <td class="px-2 xl:px-4 py-3 text-center">
-                    ${item.status === 'inStock' ? '<span class="px-2 py-1 rounded text-xs font-semibold bg-green-100 text-green-700">En Stock</span>' : 
-                      item.status === 'lowStock' ? '<span class="px-2 py-1 rounded text-xs font-semibold bg-yellow-100 text-yellow-700">Stock Faible</span>' : 
-                      '<span class="px-2 py-1 rounded text-xs font-semibold bg-red-100 text-red-700">Rupture</span>'}
-                </td>
-                <td class="px-2 xl:px-4 py-3 text-right text-red-600 font-medium">€${fmt(item.initialPriceEuro)}</td>
-                <td class="px-2 xl:px-4 py-3 text-right text-slate-700">€${fmt(item.netPriceEuro)}</td>
-                <td class="px-2 xl:px-4 py-3 text-right text-blue-700 font-semibold bg-blue-50/50">${fmt(getSellingPriceDA(item))} DA</td>
+                <td class="px-2 xl:px-4 py-3 text-center">${statusBadge(item.status)}</td>
+                <td class="px-2 xl:px-4 py-3 whitespace-nowrap text-right text-red-600 font-medium">€${fmt(item.initialPriceEuro)}</td>
+                <td class="px-2 xl:px-4 py-3 whitespace-nowrap text-right text-slate-700">€${fmt(item.netPriceEuro)}</td>
+                <td class="px-2 xl:px-4 py-3 whitespace-nowrap text-right text-blue-700 font-semibold bg-blue-50/50">${fmt(item._sellingPriceDA)} DA</td>
                 <td class="px-2 xl:px-4 py-3 text-slate-500">${esc(item.position) || '-'}</td>
-            </tr>
-        `).join('');
+            </tr>`).join('');
 
-        document.getElementById('stock-cards').innerHTML = filtered.map(item => `
-            <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
-                <div class="flex justify-between items-start">
-                    <div><div class="font-bold">${esc(item.article)}</div><div class="text-xs text-slate-500">SAP: ${esc(item.sap)}</div></div>
-                    <div class="font-bold text-green-700">${item.availableQuantity} dispo</div>
+        cards.innerHTML = wide ? '' : data.map(item => `
+            <article class="bg-white rounded-lg border border-slate-200 shadow-sm p-3">
+                <div class="flex items-start justify-between gap-2">
+                    <div class="min-w-0">
+                        <h2 class="font-semibold text-slate-800 break-words">${esc(item.article)}</h2>
+                        <div class="text-xs text-slate-500 mt-0.5">SAP ${esc(item.sap)}</div>
+                    </div>
+                    <div class="shrink-0">${statusBadge(item.status)}</div>
                 </div>
-                <div class="mt-2 text-sm text-slate-500">${esc(item.description)}</div>
-                <div class="mt-3 flex justify-between items-center border-t pt-2 text-sm">
-                    <div>Net: <span class="font-medium">€${fmt(item.netPriceEuro)}</span></div>
-                    <div class="text-blue-700 font-bold">${fmt(getSellingPriceDA(item))} DA</div>
+                ${item.description ? `<p class="text-sm text-slate-500 mt-2 break-words">${esc(item.description)}</p>` : ''}
+                <div class="flex flex-wrap gap-1.5 mt-2">
+                    ${item.category ? `<span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded border border-slate-200">${esc(item.category)}</span>` : ''}
                 </div>
-            </div>
-        `).join('');
+                <div class="grid grid-cols-4 gap-1.5 mt-3 text-center">
+                    <div class="rounded bg-blue-50 py-1.5"><div class="text-[11px] text-slate-500">Qté</div><div class="font-semibold">${esc(item.totalQuantity)}</div></div>
+                    <div class="rounded bg-slate-50 py-1.5"><div class="text-[11px] text-slate-500">Vendu</div><div class="font-medium text-slate-600">${esc(item.soldQuantity || 0)}</div></div>
+                    <div class="rounded bg-orange-50 py-1.5"><div class="text-[11px] text-slate-500">Réservé</div><div class="font-medium text-orange-500">${esc(item.reservedQuantity || 0)}</div></div>
+                    <div class="rounded bg-green-50 py-1.5"><div class="text-[11px] text-slate-500">Dispo</div><div class="font-bold text-green-700">${esc(item.availableQuantity)}</div></div>
+                </div>
+                <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 mt-3 pt-2 border-t border-slate-100 text-sm">
+                    <div><span class="text-xs text-slate-500">Init </span><span class="text-red-600 font-medium">€${fmt(item.initialPriceEuro)}</span></div>
+                    <div><span class="text-xs text-slate-500">Net </span><span class="text-slate-700 font-medium">€${fmt(item.netPriceEuro)}</span></div>
+                    <div><span class="text-xs text-slate-500">Vente unit. </span><span class="text-blue-600 font-semibold">${fmt(item._sellingPriceDA)} DA</span></div>
+                </div>
+            </article>`).join('');
     }
 
-    // --- RENDER PRICES (EXCEL) ---
+    // --- RENDER PRICES (NEW LIST) ---
     function renderPrices() {
         const term = document.getElementById('search-prices').value.toLowerCase();
         const filtered = priceData.filter(i => !term || (i.sap + i.article + i.description).toLowerCase().includes(term));
@@ -277,21 +399,39 @@
     }
 
     // Event Listeners
-    document.getElementById('search').addEventListener('input', renderStock);
+    let searchTimer;
+    document.getElementById('search').addEventListener('input', () => {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(() => { filters.search = document.getElementById('search').value; applyFilters(); }, 150);
+    });
+    document.getElementById('filter-category').addEventListener('change', (e) => { filters.category = e.target.value; applyFilters(); });
+    document.getElementById('filter-status').addEventListener('change', (e) => { filters.status = e.target.value; applyFilters(); });
+    document.getElementById('filter-position').addEventListener('change', (e) => { filters.position = e.target.value; applyFilters(); });
+    document.getElementById('filter-date').addEventListener('change', (e) => { filters.date = e.target.value; applyFilters(); });
+    document.getElementById('filter-reservation').addEventListener('change', (e) => { filters.reservation = e.target.value; applyFilters(); });
     document.getElementById('search-prices').addEventListener('input', renderPrices);
-    document.getElementById('filter-category').addEventListener('change', renderStock);
-    document.getElementById('filter-status').addEventListener('change', renderStock);
-    
+
+    document.getElementById('btn-toggle-filters').addEventListener('click', (e) => {
+        const panel = document.getElementById('filter-extra');
+        const hidden = panel.classList.toggle('max-md:hidden');
+        e.currentTarget.setAttribute('aria-expanded', String(!hidden));
+    });
+
     document.getElementById('btn-reset').addEventListener('click', () => {
         document.getElementById('search').value = '';
         document.getElementById('filter-category').value = '';
         document.getElementById('filter-status').value = '';
-        renderStock();
+        document.getElementById('filter-position').value = '';
+        document.getElementById('filter-date').value = 'all';
+        document.getElementById('filter-reservation').value = 'any';
+        filters = { ...DEFAULT_FILTERS };
+        applyFilters();
     });
 
-    // Init
+    // Initial Load
     loadData();
-    setInterval(loadData, 60000);
+    setInterval(() => { if (!document.hidden) loadData(); }, 60000);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) loadData(); });
 </script>
 
 </body>
