@@ -1,23 +1,23 @@
 {
-  "updatedAt": "2026-10-25T23:47:35.545Z",
+  "updatedAt": "2026-10-26T16:43:23.402Z",
   "products": [
     {
-      "id": "cmvk3cl890001x8utgw6agpoc",
-      "sap": "fgfgf",
-      "article": "23423423",
-      "description": "wefwefwefwef",
-      "category": "ddd",
-      "totalQuantity": 1,
+      "id": "cmvphk6rp0000ooutvhwq1ps0",
+      "sap": "testsap222",
+      "article": "3333333",
+      "description": "",
+      "category": "",
+      "totalQuantity": 3,
       "soldQuantity": 0,
       "reservedQuantity": 0,
-      "availableQuantity": 1,
+      "availableQuantity": 3,
       "status": "lowStock",
-      "initialPriceEuro": 200,
-      "netPriceEuro": 200,
-      "rate": 1,
-      "sellingPriceDA": 200,
-      "position": "a23",
-      "orderDate": "2026-10-22T00:00:00.000Z",
+      "initialPriceEuro": 130,
+      "netPriceEuro": 130,
+      "rate": 260,
+      "sellingPriceDA": 33800,
+      "position": "B34",
+      "orderDate": "2026-10-26T00:00:00.000Z",
       "hasReservation": false
     }
   ]
