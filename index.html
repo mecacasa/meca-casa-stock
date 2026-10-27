@@ -10,7 +10,6 @@
         .overflow-x-auto::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .overflow-x-auto::-webkit-scrollbar-track { background: #f1f5f9; }
         @media (max-width: 767px) { input, select { font-size: 16px !important; } }
-        /* Remove arrows from number input */
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
@@ -171,7 +170,10 @@
     let allStockData = [];
     let priceData = [];
     let globalRate = 1;
-    let globalProfitPerc = 0; // <-- NEW
+    
+    // 🟢 NEW: Load the saved profit percentage from localStorage (default to 0)
+    let globalProfitPerc = parseFloat(localStorage.getItem('meca_profit_perc')) || 0;
+    
     let lastRawStock = null;
     let lastRawPrices = null;
     
@@ -517,9 +519,11 @@
         priceSearchTimer = setTimeout(() => { filterPrices(); }, 150);
     });
 
-    // 🟢 NEW: Listen to Profit % input change
+    // 🟢 FIXED: Load and Save to localStorage
+    document.getElementById('profit-input').value = globalProfitPerc; // Set input on page load
     document.getElementById('profit-input').addEventListener('input', (e) => {
         globalProfitPerc = parseFloat(e.target.value) || 0;
+        localStorage.setItem('meca_profit_perc', globalProfitPerc); // Save to browser memory
         renderTable();
         renderPrices();
     });
